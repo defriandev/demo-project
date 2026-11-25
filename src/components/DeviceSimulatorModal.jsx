@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Monitor, Tablet, Smartphone, X, ArrowUpRight } from 'lucide-react';
 import { SITE_CONFIG } from '../data/siteConfig';
+import { isSafeDemoPath } from '../utils/security';
 import { EASE_EDITORIAL } from './MotionPrimitives';
 
 const DEVICES = [
@@ -128,7 +129,11 @@ export default function DeviceSimulatorModal({ demo, onClose }) {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               style={{ border: activeSpec.border }}
             >
-              <iframe src={demo.path} title={`Preview ${demo.name}`} />
+              <iframe
+                src={isSafeDemoPath(demo.path) ? demo.path : '/'}
+                title={`Preview ${demo.name}`}
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              />
             </motion.div>
           </motion.div>
         </motion.div>

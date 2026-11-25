@@ -1,13 +1,21 @@
+import { sanitizePhone, sanitizeText } from '../utils/security';
+
+const ENV_WA =
+  typeof import.meta !== 'undefined' && import.meta.env?.VITE_WHATSAPP_NUMBER
+    ? sanitizePhone(import.meta.env.VITE_WHATSAPP_NUMBER)
+    : '';
+
 export const SITE_CONFIG = {
   developerName: 'defriandev',
   developerRole: 'React & Frontend Engineer',
   githubUrl: 'https://github.com/defriandev/',
-  whatsappNumber: '6281234567890', // Ganti dengan nomor WhatsApp aktif kamu
+  whatsappNumber: ENV_WA || '6281234567890',
   getWhatsAppUrl(customText) {
-    const text =
-      customText ||
-      'Halo, saya tertarik konsultasi pembuatan website untuk bisnis saya.';
-    return `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(text)}`;
+    const cleanText = sanitizeText(
+      customText || 'Halo, saya tertarik konsultasi pembuatan website untuk bisnis saya.',
+      600
+    );
+    return `https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(cleanText)}`;
   },
   demos: [
     {

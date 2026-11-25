@@ -6,6 +6,7 @@ import DemoFooter from '../../components/DemoFooter';
 import DemoMobileNav from '../../components/DemoMobileNav';
 import { PageTransition, FadeInUp, StaggerGrid, StaggerItem, EASE_EDITORIAL } from '../../components/MotionPrimitives';
 import { SITE_CONFIG } from '../../data/siteConfig';
+import { sanitizeText, sanitizePhone, isValidPhone, isValidWhatsAppUrl } from '../../utils/security';
 import { MENU_DATA, CAFE_INFO, CAFE_GALLERY } from '../../data/cafeData';
 import '../../styles/demos.css';
 
@@ -46,15 +47,28 @@ export default function CafeDemo() {
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
+    const cleanName = sanitizeText(booking.name, 60);
+    const cleanPhone = sanitizePhone(booking.phone);
+    const cleanNotes = sanitizeText(booking.notes, 160);
+
+    if (!cleanName || !isValidPhone(cleanPhone)) {
+      alert('Mohon masukkan nama lengkap dan nomor WhatsApp yang valid (8–15 digit).');
+      return;
+    }
+
     const msg =
       `Halo ${CAFE_INFO.name}, saya ingin melakukan reservasi meja:\n\n` +
-      `Nama: ${booking.name}\n` +
-      `WhatsApp: ${booking.phone}\n` +
+      `Nama: ${cleanName}\n` +
+      `WhatsApp: ${cleanPhone}\n` +
       `Jumlah Tamu: ${booking.guests}\n` +
       `Tanggal: ${booking.date} (${booking.time} WIB)\n` +
       `Area: ${booking.area}\n` +
-      `Catatan: ${booking.notes || '-'}`;
-    window.open(SITE_CONFIG.getWhatsAppUrl(msg), '_blank', 'noopener,noreferrer');
+      `Catatan: ${cleanNotes || '-'}`;
+
+    const waUrl = SITE_CONFIG.getWhatsAppUrl(msg);
+    if (isValidWhatsAppUrl(waUrl)) {
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
